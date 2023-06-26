@@ -2,10 +2,10 @@
 from dhanhq import dhanhq
 import pandas as pd
 import time
-import json
+import pytz
 #Creds
 
-dhan = dhanhq("<client ID>","<API ACCESS CODE>")
+dhan = dhanhq("<CLIENT_ID>","<Access_key>")
 
 #SYMBOL_DATA
 stocks = []
@@ -29,7 +29,16 @@ for symbol in stocks:
                 )
     stock_df = pd.DataFrame(stocks_data['data'])
     stock_df.columns = ['OPEN', 'HIGH', 'LOW', 'CLOSE', 'VOLUME', 'START_TIME']
-    stock_df['START_TIME'] = pd.to_datetime(stock_df['START_TIME'], unit='s').dt.date
+    
+    #Convert Start_time in Date
+    temp_list = []
+    for i in stock_df['START_TIME']:
+        temp = dhan.convert_to_date_time(i)
+        temp_list.append(temp)
+
+    stock_df['Date'] = temp_list
+      #conversion Complete and Added a Coloumn in List
+      
     stock_df.insert(0, 'STOCK', symbol)
     df = pd.concat([df, stock_df])
 
@@ -38,7 +47,11 @@ df.reset_index(drop=True, inplace=True)
 
 # Display the DataFrame
 print(df)
-    
+# Save DataFrame to Excel file
+# output_file = 'stock_data.xlsx'
+# df.to_excel(output_file, index=False)
+
+# print("Data saved to", output_file) 
 
 
 
